@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Upload Video</h2>
+
+<input type="file" id="fileInput" accept="video/*">
+<button onclick="upload()" id="uploadBtn">Upload</button>
+
+<h3>Result:</h3>
+<pre id="output"></pre>
+
+<script>
+async function upload() {
+    const file = document.getElementById("fileInput").files[0];
+    const output = document.getElementById("output");
+    const button = document.getElementById("uploadBtn");
+
+    if (!file) {
+        alert("Please select a video file first.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    output.textContent = "Processing...";
+    button.disabled = true;
+
+    try {
+        const res = await fetch("http://127.0.0.1:8000/upload/", {
+            method: "POST",
+            body: formData
+        });
+
+        if (!res.ok) {
+            throw new Error(`Server error: ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        output.textContent = JSON.stringify(data, null, 2);
+
+    } catch (err) {
+        output.textContent = "Error: " + err.message;
+    } finally {
+        button.disabled = false;
+    }
+}
+</script>
+
+</body>
+</html>
